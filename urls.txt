@@ -1,0 +1,2 @@
+https://go.dev/
+https://git-scm.com/
