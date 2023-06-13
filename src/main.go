@@ -126,6 +126,10 @@ func main() {
 
 	if *helpFlag {
 		flag.PrintDefaults()
+		fmt.Println("Example:")
+		fmt.Println("go run src/main.go -u https://example.com -l /path/to/save/location")
+		fmt.Println("or")
+		fmt.Println("go run src/main.go -f urls.txt -l /path/to/save/location")
 		return
 	}
 
