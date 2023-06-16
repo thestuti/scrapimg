@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/cheggaaa/pb/v3"
 )
 
 const (
@@ -22,7 +23,6 @@ const (
 
 func banner() {
 	fmt.Printf(`
-
 ███████  ██████ ██████   █████  ██████  ██ ███    ███  ██████  
 ██      ██      ██   ██ ██   ██ ██   ██ ██ ████  ████ ██       
 ███████ ██      ██████  ███████ ██████  ██ ██ ████ ██ ██   ███ 
@@ -33,7 +33,7 @@ func banner() {
 `)
 }
 
-func downloadImage(url string, savePath string) error {
+func downloadImage(url string, savePath string, bar *pb.ProgressBar) error {
 	response, err := http.Get(url)
 	if err != nil {
 		return fmt.Errorf("%sError while downloading image: %v%s", ColorRed, err, ColorReset)
@@ -54,7 +54,8 @@ func downloadImage(url string, savePath string) error {
 		return fmt.Errorf("%sError while saving image: %v%s", ColorRed, err, ColorReset)
 	}
 
-	fmt.Printf("%sDownloading completed: %s%s\n", ColorGreen, saveLocation, ColorReset)
+	bar.Increment()
+
 	return nil
 }
 
@@ -104,13 +105,21 @@ func extractImagesFromURL(urlStr string, savePath string) error {
 		}
 	})
 
+	totalImages := len(images)
+
+	bar := pb.StartNew(totalImages)
+	bar.SetTemplateString(fmt.Sprintf("Downloading images from %s\n{{bar . }} {{counters . }}", urlStr))
+
 	for _, img := range images {
-		err := downloadImage(img, folderPath)
+		err := downloadImage(img, folderPath, bar)
 		if err != nil {
 			fmt.Printf("%sError while downloading image: %v%s\n", ColorRed, err, ColorReset)
 		}
 	}
 
+	bar.Finish()
+
+	fmt.Printf("%sDownloading completed from %s. Total images downloaded: %d%s\n", ColorGreen, urlStr, totalImages, ColorReset)
 	return nil
 }
 
@@ -118,9 +127,9 @@ func main() {
 	banner()
 
 	helpFlag := flag.Bool("h", false, "Display help")
-	urlFlag := flag.String("u", "url", "URL of the webpage")
-	locationFlag := flag.String("l", "location", "Location to save the extracted images")
-	fileFlag := flag.String("f", "file", "File containing URLs")
+	urlFlag := flag.String("u", "", "URL of the webpage")
+	locationFlag := flag.String("l", "", "Location to save the extracted images")
+	fileFlag := flag.String("f", "", "File containing URLs")
 
 	flag.Parse()
 
