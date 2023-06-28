@@ -143,10 +143,12 @@ func main() {
 	}
 
 	if *fileFlag == "" {
-		if *urlFlag == "" || *locationFlag == "" {
+		if *urlFlag == "" {
 			fmt.Print("Enter the URL of the webpage: ")
 			fmt.Scanln(urlFlag)
 
+		}
+		if *locationFlag == "" {
 			fmt.Print("Enter the location to save the extracted images: ")
 			fmt.Scanln(locationFlag)
 		}

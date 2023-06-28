@@ -17,6 +17,7 @@ FROM alpine:latest
 WORKDIR /app
 
 COPY --from=builder /app/extract-images /app/extract-images
+COPY --from=builder /app/urls.txt /app/urls.txt
 
 RUN apk --no-cache add ca-certificates
 
